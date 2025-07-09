@@ -2,11 +2,9 @@ from langchain_openai.chat_models import ChatOpenAI
 from langchain.schema import SystemMessage, HumanMessage
 from langchain_core.messages import BaseMessage
 from arango import ArangoClient
-from dotenv import load_dotenv
 import json
 
 # 환경 변수 로드 (OPENAI_API_KEY)
-load_dotenv()
 openai_api_key = ''
 
 # ArangoDB 연결 설정
