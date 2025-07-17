@@ -2,6 +2,9 @@ from ast import AST, NodeVisitor, ClassDef, FunctionDef, walk, Assign, Attribute
     unparse, get_docstring, get_source_segment
 import ast
 from typing import Any
+from app.python.interface.dto.edges import Edges
+from app.python.interface.dto.instance_variables import InstanceVariables
+from app.python.interface.dto.nodes import Nodes
 from app.python.services.call_visitor import CallVisitor
 from app.python.services.control_visitor import ControlVisitor
 
@@ -15,11 +18,11 @@ class Visitor(NodeVisitor):
         self.parent_file_key = parent_file_key
         self.source_code = source_code
 
-    def visit_class_def(self, node: ClassDef):
+    def visit_ClassDef(self, node: ClassDef) -> tuple[Nodes, Edges]:
         class_key = f"{self.parent_file_key}_{node.name}"
 
         # 1. __init__ 함수에서 self.xxx = ... 만 추출하여 배열로 저장
-        inst_variables = []
+        inst_variables: list[InstanceVariables] = []
         for stmt in node.body:
             if isinstance(stmt, FunctionDef) and stmt.name == "__init__":
                 for subnode in walk(node=stmt):
@@ -38,35 +41,36 @@ class Visitor(NodeVisitor):
                                         pass
                                 # 변수에 할당된 값이 있다면 문자열로 저장
                                 var_value = unparse(ast_obj=subnode.value).strip() if hasattr(ast, 'unparse') else None
-                                inst_variables.append({
-                                    'var': var_name,
-                                    'type': var_type,
-                                    'value': var_value,
-                                    'lineno': subnode.lineno
-                                })
+                                inst_variables.append(
+                                    InstanceVariables(
+                                        var=var_name,
+                                        type=var_type,
+                                        value=var_value,
+                                        lineno=subnode.lineno
+                                    )
+                                )
 
-        class_doc = {
-            '_key': class_key,
-            'type': 'class',
-            'name': node.name,
-            'defined_in': self.parent_file_key,
-            'lineno': node.lineno,
-            'docstring': get_docstring(node),
-            'source': get_source_segment(self.source_code, node),
-            'inst_variables': inst_variables
-        }
-        try:
-            nodes_col.insert(class_doc, overwrite=True)
-            edges_col.insert({
-                '_from': f'nodes/{self.parent_file_key}',
-                '_to': f'nodes/{class_key}',
-                'type': 'defines',
-                'perspective': 'class-structure'
-            })
-            print(f"Inserted class: {node.name} in {file_path}")
-        except Exception as e:
-            print(f"Failed to insert class {node.name}: {e}")
+        node = Nodes(
+            _key=class_key,
+            type='class',
+            name=node.name,
+            defined_in=self.parent_file_key,
+            lineno=node.lineno,
+            docstring=get_docstring(node=node),
+            source=get_source_segment(source=self.source_code, node=node),
+            inst_variables=inst_variables
+        )
+
+        edge = Edges(
+            _from=f'nodes/{self.parent_file_key}',
+            _to=f'nodes/{class_key}',
+            type='defines',
+            perspective='class-structure'
+        )
+
         self.generic_visit(node=node)
+
+        return node, edge
 
 
     def visit_FunctionDef(self, node: FunctionDef):

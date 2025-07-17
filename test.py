@@ -93,7 +93,7 @@ def parse_python_file(file_path: str, parent_file_key: str, db: StandardDatabase
                                         except Exception:
                                             pass
                                     # 변수에 할당된 값이 있다면 문자열로 저장
-                                    var_value = ast.unparse(subnode.value).strip() if hasattr(ast, 'unparse') else None
+                                    var_value = ast.unparse(ast_obj=subnode.value).strip() if hasattr(ast, 'unparse') else None
                                     inst_variables.append({
                                         'var': var_name,
                                         'type': var_type,

@@ -1,7 +1,6 @@
 import os
 import ast
 from pathlib import Path
-
 from app.python.services.visitor import Visitor
 from utils.arango import Arango
 
@@ -15,13 +14,10 @@ class StaticAnalyzer:
         self.arango = Arango()
 
     def parse_python_file(self, file_path: str, parent_file_key: str):
-        nodes_col = self.arango.db.collection('nodes')
-        edges_col = self.arango.db.collection('edges')
-
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
                 source_code: str = f.read()
-                tree = ast.parse(source_code, filename=file_path)
+                tree = ast.parse(source=source_code, filename=file_path)
         except Exception as e:
             print(f"Failed to parse {file_path}: {e}")
             return
