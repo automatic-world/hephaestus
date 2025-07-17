@@ -1,0 +1,36 @@
+name: deploy_hospital_lambda_cicd
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types:
+      - completed
+jobs:
+  lambda-deploy:
+    if: github.repository == 'imdr-devs/imdr_chat_websocket_lambda_python'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - uses: jitterbit/get-changed-files@v1
+        id: files
+        with:
+          format: space-delimited
+      - name: AWS 자격 증명 구성
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+      - name: Python 설정
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.13'
+      - name: Lambda 빌드 & 업데이트
+        run: |
+          pip3 install awscli
+          pip3 install -r requirements.txt -t .
+          rm -f chat_websocket_lambda_python.zip
+          zip -r chat_websocket_lambda_python.zip lambda_chat.py chat jwt redis boto3 botocore redis dateutil jmespath s3transfer six.py urllib3 *dist-info
+          aws lambda update-function-code --function-name websocket_lambda --zip-file fileb://chat_websocket_lambda_python.zip --publish
