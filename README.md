@@ -1,3 +1,8 @@
+
+<p align="center">
+<img width="1024" height="1024" alt="ChatGPT Image 2025년 7월 17일 오후 09_05_43" src="https://github.com/user-attachments/assets/aa746fd0-f982-45c5-b7b4-04fa1d04632c" />
+</p>
+
 <h1 align="center">
   <a href="">
      Forging innovation with the fire of Hephaestus
@@ -5,6 +10,7 @@
 </h1>
 
 <p align="center">
+
   <strong>Hephaestus</strong><br>
 </p>
 
