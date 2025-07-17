@@ -1,12 +1,17 @@
-from ast import NodeVisitor, ClassDef, FunctionDef, walk, Assign, Attribute, Name, \
+from ast import AST, NodeVisitor, ClassDef, FunctionDef, walk, Assign, Attribute, Name, \
     unparse, get_docstring, get_source_segment
-
+import ast
+from typing import Any
 from app.python.services.call_visitor import CallVisitor
 from app.python.services.control_visitor import ControlVisitor
 
 
 class Visitor(NodeVisitor):
-    def __init__(self, parent_file_key: str, source_code: str):
+    def __init__(
+        self,
+        parent_file_key: str,
+        source_code: str
+    ):
         self.parent_file_key = parent_file_key
         self.source_code = source_code
 
@@ -17,7 +22,7 @@ class Visitor(NodeVisitor):
         inst_variables = []
         for stmt in node.body:
             if isinstance(stmt, FunctionDef) and stmt.name == "__init__":
-                for subnode in walk(stmt):
+                for subnode in walk(node=stmt):
                     if isinstance(subnode, Assign):
                         for target in subnode.targets:
                             if (isinstance(target, Attribute) and
@@ -32,8 +37,7 @@ class Visitor(NodeVisitor):
                                     except Exception:
                                         pass
                                 # 변수에 할당된 값이 있다면 문자열로 저장
-                                import ast
-                                var_value = unparse(subnode.value).strip() if hasattr(ast, 'unparse') else None
+                                var_value = unparse(ast_obj=subnode.value).strip() if hasattr(ast, 'unparse') else None
                                 inst_variables.append({
                                     'var': var_name,
                                     'type': var_type,
@@ -62,7 +66,7 @@ class Visitor(NodeVisitor):
             print(f"Inserted class: {node.name} in {file_path}")
         except Exception as e:
             print(f"Failed to insert class {node.name}: {e}")
-        self.generic_visit(node)
+        self.generic_visit(node=node)
 
 
     def visit_FunctionDef(self, node: FunctionDef):
@@ -73,10 +77,10 @@ class Visitor(NodeVisitor):
         args = []
         for arg in node.args.args:
             arg_name = arg.arg
-            arg_type = unparse(arg.annotation).strip() if arg.annotation else None
+            arg_type = unparse(ast_obj=arg.annotation).strip() if arg.annotation else None
             args.append({'arg': arg_name, 'type': arg_type})
 
-        return_type = unparse(node.returns).strip() if node.returns else None
+        return_type = unparse(ast_obj=node.returns).strip() if node.returns else None
 
         control_visitor = ControlVisitor()
         control_visitor.visit(node)
@@ -125,3 +129,6 @@ class Visitor(NodeVisitor):
                     print(f"Failed to insert call edge {func_key} → {callee_key}: {e}")
         except Exception as e:
             print(f"Failed to insert function {node.name}: {e}")
+
+    def visit(self, node: AST) -> Any:
+        return self.visit(node=node)
