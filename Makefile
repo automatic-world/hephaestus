@@ -52,11 +52,10 @@ clean:
 	rm -f $(ZIP_FILE)
 
 poetry_export:
-	poetry export -f requirements.txt --without-hashes > requirements.txt
+	poetry export -f requirements.txt --without-hashes > requirements_deploy.txt
 
 python_install:
-	pip install --no-cache-dir --target ./python/ --python-version 3.12 --only-binary=:all: -r requirements.txt
-	#pip3 install --no-cache-dir --platform manylinux2014_x86_64 --target ./python/ --python-version 3.11 --only-binary=:all: -r requirements.txt
+	pip install --no-cache-dir --target ./python/ --python-version 3.12 --only-binary=:all: -r requirements_deploy.txt
 
 zip_deployment:
-	zip -r deployment-package.zip python/
+	zip -r hp-deployment-package.zip python/
