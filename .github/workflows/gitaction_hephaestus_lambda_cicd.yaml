@@ -8,7 +8,7 @@ on:
       - completed
 jobs:
   lambda-deploy:
-    if: github.repository == 'imdr-devs/imdr_chat_websocket_lambda_python'
+    if: github.repository == 'automatic-world/hephaestus'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
