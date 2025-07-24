@@ -58,10 +58,17 @@ clean:
 	rm -f $(ZIP_FILE)
 
 poetry_export:
-	poetry export -f requirements_deploy.txt --without-hashes > requirements_deploy.txt
+	poetry export -f requirements.txt --without-hashes > requirements.txt
+
+python_install_x86_64:
+	pip install --no-cache-dir --platform manylinux2014_x86_64 --target ./python/ --python-version 3.11 --only-binary=:all: -r requirements.txt
 
 python_install:
-	pip install --no-cache-dir --target ./python/ --python-version 3.12 --only-binary=:all: -r requirements_deploy.txt
+	pip install --no-cache-dir --target ./python/ --python-version 3.12 --only-binary=:all: -r requirements.txt
+
+python_install_with_proxy:
+	pip install -r requirements.txt --platform manylinux2014_x86_64 --target ./python --only-binary=:all:
+
 
 zip_deployment:
 	zip -r hp-deployment-package.zip python/

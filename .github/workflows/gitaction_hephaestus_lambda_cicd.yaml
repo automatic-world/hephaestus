@@ -30,7 +30,7 @@ jobs:
       - name: Lambda 빌드 & 업데이트
         run: |
           pip3 install awscli
-          pip3 install -r requirements_deploy.txt -t .
+          pip3 install -r requirements.txt -t .
           rm -f hephaestus-api-lambda.zip
           zip -r hephaestus-api-lambda.zip app db utils  *.py 
           aws lambda update-function-code --function-name hephaestus-api-lambda --zip-file fileb://hephaestus-api-lambda.zip --publish
