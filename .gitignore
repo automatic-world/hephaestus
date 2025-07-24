@@ -887,5 +887,3 @@ pyproject.toml
 python/
 
 hp-deployment-package.zip
-
-requirements_deploy.txt
