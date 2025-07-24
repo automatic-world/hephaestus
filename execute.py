@@ -1,30 +1,41 @@
 
 import json
+from fastapi import FastAPI
+from mangum import Mangum
 
+# Create FastAPI application
+app = FastAPI(
+    title="Hephaestus API",
+    description="FastAPI application with Mangum for AWS Lambda",
+    version="1.0.0"
+)
+
+# Hello World endpoint
+@app.get("/")
+def read_root():
+    return {"message": "Hello, World!", "service": "Hephaestus"}
+
+# Hello with name parameter
+@app.get("/hello/{name}")
+def read_hello(name: str):
+    return {"message": f"Hello, {name}!", "service": "Hephaestus"}
+
+# Health check endpoint
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "Hephaestus"}
+
+# Items endpoint with query parameters (FastAPI sample)
+@app.get("/items/{item_id}")
+def read_item(item_id: int, q: str = None):
+    return {"item_id": item_id, "q": q, "service": "Hephaestus"}
+
+# Create the Lambda handler using Mangum
+handler = Mangum(app, lifespan="off")
+
+# Keep the original lambda_handler for backward compatibility
 def lambda_handler(event, context):
     """
-    AWS Lambda 기본 핸들러 함수
-
-    Parameters:
-    - event: 호출 시 전달되는 이벤트 정보 (dict)
-    - context: 실행 환경에 대한 메타 정보 (object)
-
-    Returns:
-    - dict: API Gateway용 JSON 응답 구조
+    AWS Lambda handler function that uses Mangum to process FastAPI requests
     """
-    print("Received event:", json.dumps(event))
-
-    # 예시: GET 요청의 쿼리 파라미터 처리
-    name = event.get("queryStringParameters", {}).get("name", "World")
-
-    response = {
-        "statusCode": 200,
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "body": json.dumps({
-            "message": f"Hello, {name}!"
-        })
-    }
-
-    return response
+    return handler(event, context)

@@ -5,6 +5,12 @@ FILE=deployments/deployments.yaml
 fastapi_run:
 	uvicorn app.interfaces.rest.main:app --reload --port 8080
 
+fastapi_local:
+	python test_fastapi.py
+
+fastapi_dev:
+	uvicorn execute:app --reload --port 8000
+
 docker_build:
 	docker build --platform=linux/amd64 -f ./deployments/prod/Dockerfile  -t $(NEW_IMAGE) .
 
@@ -35,8 +41,8 @@ docker_manager_run:
 
 # Makefile
 # Variables
-ZIP_FILE = chat_websocket_lambda_python.zip
-SOURCE_DIRS = lambda_chat.py
+ZIP_FILE = hephaestus.zip
+SOURCE_DIRS = *.py app db utils
 
 # Default target
 all: zip
@@ -52,10 +58,11 @@ clean:
 	rm -f $(ZIP_FILE)
 
 poetry_export:
-	poetry export -f requirements.txt --without-hashes > requirements_deploy.txt
+	poetry export -f requirements_deploy.txt --without-hashes > requirements_deploy.txt
 
 python_install:
 	pip install --no-cache-dir --target ./python/ --python-version 3.12 --only-binary=:all: -r requirements_deploy.txt
 
 zip_deployment:
 	zip -r hp-deployment-package.zip python/
+

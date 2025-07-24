@@ -26,11 +26,11 @@ jobs:
       - name: Python 설정
         uses: actions/setup-python@v3
         with:
-          python-version: '3.13'
+          python-version: '3.12'
       - name: Lambda 빌드 & 업데이트
         run: |
           pip3 install awscli
-          pip3 install -r requirements.txt -t .
-          rm -f chat_websocket_lambda_python.zip
-          zip -r chat_websocket_lambda_python.zip lambda_chat.py chat jwt redis boto3 botocore redis dateutil jmespath s3transfer six.py urllib3 *dist-info
-          aws lambda update-function-code --function-name websocket_lambda --zip-file fileb://chat_websocket_lambda_python.zip --publish
+          pip3 install -r requirements_deploy.txt -t .
+          rm -f hephaestus-api-lambda.zip
+          zip -r hephaestus-api-lambda.zip app db utils  *.py 
+          aws lambda update-function-code --function-name hephaestus-api-lambda --zip-file fileb://hephaestus-api-lambda.zip --publish
