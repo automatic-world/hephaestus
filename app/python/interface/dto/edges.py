@@ -6,4 +6,4 @@ class Edges(BaseModel):
     to_: str = Field(..., alias='_to', description='id of collection: end point of relationship')
     type: str = Field(..., alias='type', description='definition of relationship')
     perspective: str = Field(..., alias='perspective', description='explaining of relation')
-    # directory-hierarchy, file-structure, class-structure, function-call
+    # directory-hierarchy, file-structure, class-structure, function-call, function-structure

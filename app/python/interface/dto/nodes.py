@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+from app.python.interface.dto.arg import Arg
+from app.python.interface.dto.control_flow import ControlFlow
 from app.python.interface.dto.instance_variables import InstanceVariables
 
 
@@ -12,6 +14,6 @@ class Nodes(BaseModel):
     docstring: str | None = Field(default=None, alias='docstring', description='comments written by developers')
     source: str | None = Field(default=None, alias='source', description='full content of functions')
     inst_variables: list[InstanceVariables] | None = Field(default=None, alias='inst_variables', description="information of instance's variables")
-    args: list
-    return_type: str
-    control_flow: str
+    args: list[Arg] | None = Field(default=None, alias='args', description='Arguments of the function')
+    return_type: str | None = Field(default=None, alias='return_type', description='return type of the function')
+    control_flow: list[ControlFlow] | None = Field(default=None, alias='control_flow', description='control flows of the function')
